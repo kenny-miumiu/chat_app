@@ -1,13 +1,14 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_app_project/home/home.dart';
+import 'package:flutter_app_project/home/tutorial.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:splashscreen/splashscreen.dart';
 
 
 void main() {
   runApp(
     MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: MyApp(),
     ),
   );
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SplashScreen(
-      seconds: 10,
+      seconds: 5,
       navigateAfterSeconds: MyHomePage(),
       title: Text("Chat App"),
       loaderColor: Colors.red,
@@ -25,56 +26,47 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget{
+  MyHomePage({Key key}) : super(key: key);
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage>{
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            SingleChildScrollView(
-                child: Container(
-                  height: 400,
-                  width: 300,
-                  margin: EdgeInsets.only(bottom: 30),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue)
-                  ),
-                  child: Text("このアプリは..."),
-                )
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.circle),
-                Icon(Icons.circle),
-                Icon(Icons.circle),
-              ],
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width / 1.3,
-              height: MediaQuery.of(context).size.height / 12,
-              margin: EdgeInsets.only(top: 15),
-              child: RaisedButton(
-                color: Colors.red,
-                textColor: Colors.white,
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return Home();
-                      }
-                    )
+    // チュートリアルが表示される仕組み
+    // まず最初にshared_preferencesを使って、'done'にtrueを格納しておく
+    // shared_preferencesは、デバイス上に情報を保存する仕組みを持っている
+    void showTutorial() async {
+      final preference = await SharedPreferences.getInstance();
+      preference.setBool('done', true);
+    }
+
+    // もし、trueじゃなければチュートリアルを表示する
+    // trueならそのまま処理を実行する
+    void hideTutorial() async {
+      final preference = await SharedPreferences.getInstance();
+
+      if (preference.getBool('done') != true) {
+        Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (context) {
+                  return Tutorial(
+                    showTutorial: showTutorial,
                   );
-                },
-                child: Text("チャットを始める"),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+                }
+            )
+        );
+      }
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      hideTutorial();
+    });
+
+    return Home();
   }
 }
 

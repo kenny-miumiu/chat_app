@@ -4,6 +4,8 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/flutter_app_project/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/flutter_app_project/bug/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/flutter_app_project/bug/build" />
       <excludeFolder url="file://$MODULE_DIR$/flutter_app_project/build" />
     </content>
     <orderEntry type="inheritedJdk" />
