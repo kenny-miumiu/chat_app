@@ -4,7 +4,6 @@ import 'package:flutter_app_project/home/tutorial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:splashscreen/splashscreen.dart';
 
-
 void main() {
   runApp(
     MaterialApp(
@@ -26,14 +25,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget{
+class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>{
+class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     // チュートリアルが表示される仕組み
@@ -50,15 +49,11 @@ class _MyHomePageState extends State<MyHomePage>{
       final preference = await SharedPreferences.getInstance();
 
       if (preference.getBool('done') != true) {
-        Navigator.of(context).push(
-            MaterialPageRoute(
-                builder: (context) {
-                  return Tutorial(
-                    showTutorial: showTutorial,
-                  );
-                }
-            )
-        );
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+          return Tutorial(
+            showTutorial: showTutorial,
+          );
+        }));
       }
     }
 
@@ -69,4 +64,3 @@ class _MyHomePageState extends State<MyHomePage>{
     return Home();
   }
 }
-
