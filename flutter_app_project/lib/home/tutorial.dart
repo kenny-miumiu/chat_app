@@ -33,31 +33,33 @@ class _TutorialState extends State<Tutorial> {
   Widget build(BuildContext context) {
     // 最初にテキストとしておいているhtmlを持ってきて、コントローラーの中に情報を格納する
     // 初回のみの実行
-    Future loadHtmlFromAssets() async {
-      String fileText = await rootBundle.loadString('assets/tutorial.html');
+    // rootBundle.loadStringからは、assetsのhtmlを得ることはできないので、個別に作るしかない。
+    // 冗長化を防ぐためには、ページ数をできるだけ減らした方が良い
+    Future<void> loadHtmlFromAssets() async {
+      String fileText = await rootBundle.loadString('assets/tutorial1.html');
 
       _webViewController.loadUrl(Uri.dataFromString(fileText,
               mimeType: 'text/html', encoding: Encoding.getByName('utf-8'))
           .toString());
     }
 
-    Future loadHtmlFromAssets2() async {
+    Future<void> loadHtmlFromAssets2() async {
       String fileText = await rootBundle.loadString('assets/tutorial2.html');
       _webViewController.loadUrl(Uri.dataFromString(fileText,
               mimeType: 'text/html', encoding: Encoding.getByName('utf-8'))
           .toString());
     }
 
-    Future loadHtmlFromAssets3() async {
+    Future<void> loadHtmlFromAssets3() async {
       String fileText = await rootBundle.loadString('assets/tutorial3.html');
       _webViewController.loadUrl(Uri.dataFromString(fileText,
               mimeType: 'text/html', encoding: Encoding.getByName('utf-8'))
           .toString());
     }
 
+    // 押したボタンで場合分けを行う
     Future<void> webViewCreating(WebViewController webViewController) async {
       _webViewController = webViewController;
-      print('処理が止まる場所');
       if (transitionViewer == 0) {
         await loadHtmlFromAssets();
       } else if (transitionViewer == 1) {
@@ -65,6 +67,27 @@ class _TutorialState extends State<Tutorial> {
       } else {
         loadHtmlFromAssets3();
       }
+    }
+
+    // IconButtonのリストをfor文で作っている
+    // 冗長化を防ぐため、リスト形式で格納している
+    List<IconButton> createIconButton() {
+      const assetsNumber = 3;
+      List<IconButton> crtIconButton = [];
+      for (var i = 0; i < assetsNumber; i++) {
+        crtIconButton.add(
+          IconButton(
+            icon: Icon(Icons.circle),
+            onPressed: () {
+              setState(() {
+                transitionViewer = i;
+                webViewCreating(_webViewController);
+              });
+            },
+          ),
+        );
+      }
+      return crtIconButton;
     }
 
     return Scaffold(
@@ -76,7 +99,7 @@ class _TutorialState extends State<Tutorial> {
               child: Container(
                 height: 400,
                 width: 300,
-                margin: EdgeInsets.only(bottom: 30),
+                margin: const EdgeInsets.only(bottom: 30),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.blue),
                 ),
@@ -89,53 +112,27 @@ class _TutorialState extends State<Tutorial> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.circle, size: 15),
-                  onPressed: () {
-                    setState(() {
-                      transitionViewer = 0;
-                      webViewCreating(_webViewController);
-                    });
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.circle, size: 15),
-                  onPressed: () {
-                    setState(() {
-                      transitionViewer = 1;
-                      webViewCreating(_webViewController);
-                    });
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.circle, size: 15),
-                  onPressed: () {
-                    setState(() {
-                      transitionViewer = 2;
-                      webViewCreating(_webViewController);
-                    });
-                  },
-                ),
-                Text(transitionViewer.toString())
-              ],
+              children: createIconButton(),
             ),
             Container(
               width: MediaQuery.of(context).size.width / 1.3,
               height: MediaQuery.of(context).size.height / 12,
               margin: const EdgeInsets.only(top: 15),
-              child: RaisedButton(
+              child: Container(
                 color: Colors.red,
-                textColor: Colors.white,
-                onPressed: () {
-                  widget.showTutorial;
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) {
-                      return Home();
-                    }),
-                  );
-                },
-                child: Text("チャットを始める"),
+                child: TextButton(
+                  style: TextButton.styleFrom(primary: Colors.white),
+                  onPressed: () {
+                    // ignore: unnecessary_statements
+                    widget.showTutorial;
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) {
+                        return Home();
+                      }),
+                    );
+                  },
+                  child: Text("チャットを始める"),
+                ),
               ),
             ),
           ],
